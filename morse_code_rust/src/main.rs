@@ -4,7 +4,6 @@ use std::*;
 const UNKNOWN_CHARACTER: &str = "........";
 
 fn main() {
-    println!("Testing");
     let prompt = &"Enter a word or phrase to encode into Morse.";
     let response = input(prompt);
     let encoded_message = encode(&response);
