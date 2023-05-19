@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 use std::*;
 
-const UNKNOWN_CHARACTER: &str = "........";
+const UNKNOWN_CHARACTER: &str = "........"; //<HH> ERROR - Morse Standards
 
 fn main() {
     let prompt = &"Enter a word or phrase to encode into Morse.";
     let response = input(prompt);
-    let encoded_message = encode(&response);
+    let encoded_message = encode(&response.trim());
     println!("{:?}", encoded_message);
 }
 
@@ -24,7 +24,7 @@ pub fn encode(message: &str) -> String {
         .chars()
         .map(|char| char.to_uppercase().to_string())
         .map(|letter| dictionary.get(letter.as_str()))
-        .map(|option| option.unwrap_or(&UNKNOWN_CHARACTER).to_string())
+        .map(|option| option.unwrap_or_else(|| &UNKNOWN_CHARACTER).to_string())
         .collect::<Vec<String>>()
         .join(" ")
 }
