@@ -1,5 +1,9 @@
 use std::collections::HashMap;
 use std::*;
+use rodio::{Decoder, Source};
+use std::io::{self, BufReader};
+use std::fs::File;
+use std::thread::sleep;
 
 const UNKNOWN_CHARACTER: &str = "........"; //<HH> ERROR - Morse Standards
 
@@ -8,6 +12,9 @@ fn main() {
     let response = input(prompt);
     let encoded_message = encode(&response.trim());
     println!("{:?}", encoded_message);
+
+    //play encoded message
+    play_morse(encoded_message);
 }
 
 fn input (message: &'_ impl fmt::Display) -> String {
@@ -27,6 +34,33 @@ pub fn encode(message: &str) -> String {
         .map(|option| option.unwrap_or_else(|| &UNKNOWN_CHARACTER).to_string())
         .collect::<Vec<String>>()
         .join(" ")
+}
+
+pub fn play_morse(message: String){
+    //audio file setup
+    let (_stream, handle) = rodio::OutputStream::try_default().unwrap();
+    let sink = rodio::Sink::try_new(&handle).unwrap();
+    let morse_dot = BufReader::new(File::open("morse_dot.mp3").unwrap());
+    let morse_dash = BufReader::new(File::open("morse_dash.mp3").unwrap());
+
+    //sink.append(rodio::Decoder::new(BufReader::new(morse_dot)).unwrap()); //had to remove from loop because File couldn't be copied
+    //add Decoder and buffers
+    let decoder_dot = Decoder::new(morse_dot).unwrap();
+    let buffered_dot = decoder_dot.buffered();
+    let decoder_dash = Decoder::new(morse_dash).unwrap();
+    let buffered_dash = decoder_dash.buffered();
+
+    for index in message.chars(){
+        if index == '.' {
+            sink.append(buffered_dot.clone());
+        } else if index == '-' {
+            sink.append(buffered_dash.clone());
+        } else {
+            sleep(time::Duration::from_secs(1)); //add a sleep to handle space between letters and words
+        }
+    }
+
+    sink.sleep_until_end();
 }
 
 macro_rules! map {
