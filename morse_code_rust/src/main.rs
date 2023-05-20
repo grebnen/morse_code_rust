@@ -43,7 +43,6 @@ pub fn play_morse(message: String){
     let morse_dot = BufReader::new(File::open("morse_dot.mp3").unwrap());
     let morse_dash = BufReader::new(File::open("morse_dash.mp3").unwrap());
 
-    //sink.append(rodio::Decoder::new(BufReader::new(morse_dot)).unwrap()); //had to remove from loop because File couldn't be copied
     //add Decoder and buffers
     let decoder_dot = Decoder::new(morse_dot).unwrap();
     let buffered_dot = decoder_dot.buffered();
@@ -56,7 +55,7 @@ pub fn play_morse(message: String){
         } else if index == '-' {
             sink.append(buffered_dash.clone());
         } else {
-            sleep(time::Duration::from_secs(1)); //add a sleep to handle space between letters and words
+            sleep(time::Duration::from_millis(200)); //add a sleep to handle space between letters and words
         }
     }
 
